@@ -14,11 +14,10 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_C_STANDARD 11)
 set(CMAKE_C_STANDARD_REQUIRED ON)
 
-get_filename_component(COMPILER_LIB_PATH "${CMAKE_CXX_COMPILER}" DIRECTORY)
-message(STATUS "Directory path containing compiler libraries: ${COMPILER_LIB_PATH}")
-
 find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS Core)
 find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Core)
+
+add_subdirectory(3rdparty)
 
 # --- Application target properties ---
 
@@ -30,18 +29,11 @@ target_link_libraries(LozaBot
     Qt${QT_VERSION_MAJOR}::Core
 )
 
-target_link_directories(LozaBot
-    PRIVATE
-    ${COMPILER_LIB_PATH}
-)
-
 # --- Unit Test target properties ---
 
 add_executable(LozaBotTest
     tst_testcase.cpp
 )
-
-add_subdirectory(3rdparty/googletest)
 
 target_link_libraries(LozaBotTest
     PUBLIC
@@ -51,9 +43,19 @@ target_link_libraries(LozaBotTest
     gmock_main
 )
 
-target_link_directories(LozaBotTest
-    PRIVATE
-    ${COMPILER_LIB_PATH}
-)
-
 add_test(NAME LozaBotUnitTest COMMAND LozaBotTest)
+
+get_property(targets DIRECTORY PROPERTY BUILDSYSTEM_TARGETS)
+foreach(target ${targets})
+    get_target_property(target_type ${target} TYPE)
+    if(target_type STREQUAL "EXECUTABLE")
+        set_target_properties(${target}
+            PROPERTIES
+            ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/${target}/lib"
+            LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/${target}/lib"
+            RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/${target}/bin"
+        )
+    endif()
+endforeach()
+
+include(cmake/QtCompileProperties.cmake)
