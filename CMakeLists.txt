@@ -27,6 +27,7 @@ add_executable(LozaBot
 
 target_link_libraries(LozaBot
     Qt${QT_VERSION_MAJOR}::Core
+    fmt
 )
 
 # --- Unit Test target properties ---
@@ -41,6 +42,7 @@ target_link_libraries(LozaBotTest
     gmock
     gtest_main
     gmock_main
+    fmt
 )
 
 add_test(NAME LozaBotUnitTest COMMAND LozaBotTest --gtest_shuffle)

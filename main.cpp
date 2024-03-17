@@ -1,11 +1,11 @@
 #include <QCoreApplication>
-#include <QDebug>
+#include <fmt/core.h>
 
 int main(int argc, char *argv[])
 {
     QCoreApplication a(argc, argv);
 
-    qDebug() << "Goodbye World";
+    fmt::print("Goodbye World\n");
 
     return a.exec();
 }
