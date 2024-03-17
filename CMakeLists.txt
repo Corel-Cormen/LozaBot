@@ -43,7 +43,7 @@ target_link_libraries(LozaBotTest
     gmock_main
 )
 
-add_test(NAME LozaBotUnitTest COMMAND LozaBotTest)
+add_test(NAME LozaBotUnitTest COMMAND LozaBotTest --gtest_shuffle)
 
 get_property(targets DIRECTORY PROPERTY BUILDSYSTEM_TARGETS)
 foreach(target ${targets})

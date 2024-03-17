@@ -21,13 +21,15 @@ if(NOT CXX_COMPILER_LIB_PATH AND NOT QT_COMPILER_LIB_PATH)
     message(STATUS "Configuration based on the path to the Qt compiler")
 
     get_filename_component(CXX_COMPILER_LIB_PATH "${CMAKE_CXX_COMPILER}" DIRECTORY)
-    set(QT_COMPILER_LIB_PATH ${CMAKE_PREFIX_PATH}/bin)
+    string(FIND ${QT_DIR} "/lib" LIB_PATH_INDEX REVERSE)
+    string(SUBSTRING ${QT_DIR} 0 ${LIB_PATH_INDEX} QT_COMPILER_LIB_PATH)
+    set(QT_COMPILER_LIB_PATH ${QT_COMPILER_LIB_PATH}/bin)
 else()
     message(STATUS "Paths defined by user")
 endif()
 
-message(STATUS "Qt libs path: ${QT_COMPILER_LIB_PATH}")
 message(STATUS "CXX libs path: ${CXX_COMPILER_LIB_PATH}")
+message(STATUS "Qt libs path: ${QT_COMPILER_LIB_PATH}")
 
 set(QT_LIB_LIST_FILES_APP
     Qt5Core.dll
