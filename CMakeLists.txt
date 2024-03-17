@@ -14,10 +14,15 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_C_STANDARD 11)
 set(CMAKE_C_STANDARD_REQUIRED ON)
 
-find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS Core)
-find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Core)
+set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib")
+set(CMAKE_LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib")
+
+find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS Core Network)
+find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Core Network)
 
 add_subdirectory(3rdparty)
+
+add_subdirectory(App/RequestDriver)
 
 # --- Application target properties ---
 
@@ -28,6 +33,7 @@ add_executable(LozaBot
 target_link_libraries(LozaBot
     Qt${QT_VERSION_MAJOR}::Core
     fmt
+    RequestDriver
 )
 
 # --- Unit Test target properties ---
@@ -53,8 +59,6 @@ foreach(target ${targets})
     if(target_type STREQUAL "EXECUTABLE")
         set_target_properties(${target}
             PROPERTIES
-            ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/${target}/lib"
-            LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/${target}/lib"
             RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/${target}/bin"
         )
     endif()
