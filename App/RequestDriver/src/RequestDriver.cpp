@@ -1,53 +1,91 @@
 #include <QtNetwork>
+#include <fmt/core.h>
 
 #include "RequestDriver.hpp"
 
-RequestDriver::RequestDriver() {}
-
-void RequestDriver::receiveResponse()
+RequestDriver::RequestDriver(QEventLoopWrapper& _eventLoop,
+                             QNetworkAccessManagerWrapper& _networkManager) :
+    eventLoop(_eventLoop),
+    networkManager(_networkManager)
 {
-    if(networkReply->error() == QNetworkReply::NoError)
+
+}
+
+Error_Code_T RequestDriver::GET(const QUrl& url)
+{
+    Error_Code_T status = configureGET(url);
+
+    if(status == Error_Code_T::SUCCESS)
     {
-        QByteArray responseData = networkReply->readAll();
-        qDebug() << "Response:";
-        qDebug() << responseData;
-
-        qDebug() << "";
-
-        QList<QByteArray> headers = networkReply->rawHeaderList();
-        qDebug() << "Headers:";
-        foreach(const QByteArray& header, headers)
+        if(int reqExecResult = eventLoop.exec();
+                reqExecResult == 0)
         {
-            qDebug() << header << ":" << networkReply->rawHeader(header);
+            fmt::println("Execute GET request");
+            status = receiveResponse();
+        }
+        else
+        {
+            fmt::println("Execute GET request with error: {}", reqExecResult);
+            status = Error_Code_T::ERROR;
         }
     }
     else
     {
-        qDebug() << "Error status code:" << networkReply->error();
+        fmt::println("Configure GET request error");
+    }
+
+    return status;
+}
+
+Error_Code_T RequestDriver::configureGET(const QUrl& url)
+{
+    networkReply = networkManager.get(QNetworkRequest(url));
+
+    bool connectResult = connect(networkReply,
+                                 &QNetworkReply::finished,
+                                 &eventLoop,
+                                 &QEventLoopWrapper::quit);
+
+    if(connectResult)
+    {
+        fmt::println("request configured to: {}", url.toDisplayString().toStdString());
+        return Error_Code_T::SUCCESS;
+    }
+    else
+    {
+        fmt::println("request error configured to: {}", url.toDisplayString().toStdString());
+        return Error_Code_T::ERROR;
+    }
+}
+
+Error_Code_T RequestDriver::receiveResponse()
+{
+    Error_Code_T status = Error_Code_T::ERROR;
+
+    if(networkReply->error() == QNetworkReply::NoError)
+    {
+        if(int httpCode = networkReply->attribute(QNetworkRequest::HttpStatusCodeAttribute).toInt();
+                httpCode == 200)
+        {
+            fmt::println("Headers data:");
+            foreach(auto headerField, networkReply->rawHeaderPairs())
+            {
+                fmt::println(fmt::format("{} : {}", headerField.first.toStdString(), headerField.second.toStdString()));
+            }
+            status = Error_Code_T::SUCCESS;
+        }
+        else
+        {
+            fmt::println("Request response with code: {}", httpCode);
+        }
+    }
+    else
+    {
+        fmt::println("network reply error code: {}", static_cast<int>(networkReply->error()));
+        fmt::println("network reply error description: {}", networkReply->errorString().toStdString());
     }
 
     networkReply->deleteLater();
-}
 
-void RequestDriver::reciveCall()
-{
-    connect(networkReply, &QNetworkReply::finished, this, &RequestDriver::receiveResponse);
-}
-
-void RequestDriver::GET()
-{
-    QNetworkAccessManager manager;
-
-    QNetworkRequest request(QUrl("https://www.zalando-lounge.pl"));
-    networkReply = manager.get(request);
-
-    // TO DO: QEventLoop implement to get rid timer
-
-    reciveCall();
-
-    QTime dieTime= QTime::currentTime().addSecs(1);
-    while (QTime::currentTime() < dieTime)
-    {
-        QCoreApplication::processEvents(QEventLoop::AllEvents, 100);
-    }
+    return status;
 }

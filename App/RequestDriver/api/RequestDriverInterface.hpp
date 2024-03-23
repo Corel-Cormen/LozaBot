@@ -1,6 +1,9 @@
 #pragma once
 
 #include <QObject>
+#include <optional>
+
+#include "CommonTypes.hpp"
 
 class RequestDriverInterface : public QObject
 {
@@ -12,5 +15,5 @@ public:
 
     virtual ~RequestDriverInterface() = default;
 
-    virtual void GET() = 0;
+    [[nodiscard]] virtual Error_Code_T GET(const QUrl& url) = 0;
 };

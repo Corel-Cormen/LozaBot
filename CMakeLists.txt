@@ -22,7 +22,10 @@ find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Core Network)
 
 add_subdirectory(3rdparty)
 
+include_directories(App/Common)
+
 add_subdirectory(App/RequestDriver)
+add_subdirectory(App/QtWrappers)
 
 # --- Application target properties ---
 
@@ -39,7 +42,9 @@ target_link_libraries(LozaBot
 # --- Unit Test target properties ---
 
 add_executable(LozaBotTest
-    tst_testcase.cpp
+    RequestDriverTest.cpp
+    MockQEventLoopWrapper.hpp
+    MockQNetworkAccessManagerWrapper.hpp
 )
 
 target_link_libraries(LozaBotTest
@@ -49,6 +54,8 @@ target_link_libraries(LozaBotTest
     gtest_main
     gmock_main
     fmt
+    QtWrappers
+    RequestDriver
 )
 
 add_test(NAME LozaBotUnitTest COMMAND LozaBotTest --gtest_shuffle)
