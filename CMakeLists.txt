@@ -17,58 +17,18 @@ set(CMAKE_C_STANDARD_REQUIRED ON)
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib")
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib")
 
+set(CXX_COMPILER_LIB_PATH "" CACHE STRING "C++ libs compile tools bin path")
+set(QT_COMPILER_LIB_PATH "" CACHE STRING "Qt libs compile tools bin path")
+set(SSH_LIB_PATH "" CACHE STRING "Ssh lib tools path")
+
 find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS Core Network)
 find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Core Network)
+
+include(cmake/QtWinFilesDefined.cmake)
+include(cmake/CmakeFunction.cmake)
 
 add_subdirectory(3rdparty)
 
 include_directories(App/Common)
-
-add_subdirectory(App/RequestDriver)
-add_subdirectory(App/QtWrappers)
-
-# --- Application target properties ---
-
-add_executable(LozaBot
-    main.cpp
-)
-
-target_link_libraries(LozaBot
-    Qt${QT_VERSION_MAJOR}::Core
-    fmt
-    RequestDriver
-)
-
-# --- Unit Test target properties ---
-
-add_executable(LozaBotTest
-    RequestDriverTest.cpp
-    MockQEventLoopWrapper.hpp
-    MockQNetworkAccessManagerWrapper.hpp
-)
-
-target_link_libraries(LozaBotTest
-    PUBLIC
-    gtest
-    gmock
-    gtest_main
-    gmock_main
-    fmt
-    QtWrappers
-    RequestDriver
-)
-
-add_test(NAME LozaBotUnitTest COMMAND LozaBotTest --gtest_shuffle)
-
-get_property(targets DIRECTORY PROPERTY BUILDSYSTEM_TARGETS)
-foreach(target ${targets})
-    get_target_property(target_type ${target} TYPE)
-    if(target_type STREQUAL "EXECUTABLE")
-        set_target_properties(${target}
-            PROPERTIES
-            RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/${target}/bin"
-        )
-    endif()
-endforeach()
-
-include(cmake/QtCompileProperties.cmake)
+add_subdirectory(App)
+add_subdirectory(UnitTests)
