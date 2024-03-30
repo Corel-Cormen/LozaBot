@@ -106,7 +106,45 @@ TEST_F(RequestDriverTest, NetworkReplyBadHttpCode)
     EXPECT_EQ(Error_Code_T::ERROR, driver.GET(url));
 }
 
-TEST_F(RequestDriverTest, GETRequestSuccess)
+TEST_F(RequestDriverTest, GETRequestSuccessWithEmptyResponse)
+{
+    QNetworkReplyBridge reply;
+    reply.setError(QNetworkReply::NoError, "QNetworkReply::NoError");
+    reply.setAttribute(QNetworkRequest::HttpStatusCodeAttribute, 200);
+
+    EXPECT_CALL(mockNetworkManager, get).WillOnce(Return(&reply));
+    EXPECT_CALL(mockEventLoop, exec).WillOnce(Return(0));
+
+    EXPECT_EQ(Error_Code_T::SUCCESS, driver.GET(url));
+
+    RequestDriver::MetadataList headersList;
+    EXPECT_FALSE(driver.getResponseHeader(headersList));
+    EXPECT_TRUE(headersList.isEmpty());
+}
+
+TEST_F(RequestDriverTest, GETRequestSuccessWithResponse)
+{
+    QNetworkReplyBridge reply;
+    reply.setError(QNetworkReply::NoError, "QNetworkReply::NoError");
+    reply.setAttribute(QNetworkRequest::HttpStatusCodeAttribute, 200);
+    QByteArray metadataHeader = "HeaderField";
+    QByteArray dataHeader = "HeaderFieldValue";
+    reply.setRawHeader(metadataHeader, dataHeader);
+
+    EXPECT_CALL(mockNetworkManager, get).WillOnce(Return(&reply));
+    EXPECT_CALL(mockEventLoop, exec).WillOnce(Return(0));
+
+    EXPECT_EQ(Error_Code_T::SUCCESS, driver.GET(url));
+
+    RequestDriver::MetadataList headersList;
+    EXPECT_TRUE(driver.getResponseHeader(headersList));
+    EXPECT_FALSE(headersList.isEmpty());
+    ASSERT_EQ(1, headersList.length());
+    EXPECT_EQ(metadataHeader, headersList.at(0).first);
+    EXPECT_EQ(dataHeader, headersList.at(0).second);
+}
+
+TEST_F(RequestDriverTest, GETRequestSuccessWithResponseMoveTest)
 {
     QNetworkReplyBridge reply;
     reply.setError(QNetworkReply::NoError, "QNetworkReply::NoError");
@@ -117,4 +155,11 @@ TEST_F(RequestDriverTest, GETRequestSuccess)
     EXPECT_CALL(mockEventLoop, exec).WillOnce(Return(0));
 
     EXPECT_EQ(Error_Code_T::SUCCESS, driver.GET(url));
+
+    RequestDriver::MetadataList headersList;
+    EXPECT_TRUE(driver.getResponseHeader(headersList));
+    EXPECT_FALSE(headersList.isEmpty());
+
+    EXPECT_FALSE(driver.getResponseHeader(headersList));
+    EXPECT_TRUE(headersList.isEmpty());
 }

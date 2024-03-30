@@ -1,7 +1,6 @@
 #pragma once
 
 #include <QObject>
-#include <optional>
 
 #include "CommonTypes.hpp"
 
@@ -16,4 +15,7 @@ public:
     virtual ~RequestDriverInterface() = default;
 
     [[nodiscard]] virtual Error_Code_T GET(const QUrl& url) = 0;
+
+    typedef QList<QPair<QString, QString>> MetadataList;
+    virtual bool getResponseHeader(MetadataList& header) = 0;
 };

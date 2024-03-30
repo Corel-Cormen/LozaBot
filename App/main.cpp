@@ -24,6 +24,20 @@ int main(int argc, char *argv[])
     if(reqStatus == Error_Code_T::SUCCESS)
     {
         fmt::println("GET request send and parse success");
+
+        RequestDriverInterface::MetadataList headersList;
+        bool resultHeader = drv.getResponseHeader(headersList);
+        if(resultHeader)
+        {
+            foreach(auto header, headersList)
+            {
+                fmt::println(fmt::format("{} : {}", header.first.toStdString(), header.second.toStdString()));
+            }
+        }
+        else
+        {
+            fmt::println("Response headers is empty");
+        }
     }
     else
     {
