@@ -6,8 +6,8 @@
 
 RequestDriver::RequestDriver(QEventLoopWrapper& _eventLoop,
                              QNetworkAccessManagerWrapper& _networkManager) :
-    eventLoop(_eventLoop),
     networkManager(_networkManager),
+    eventLoop(_eventLoop),
     requestCache(new RequestCache)
 {
 

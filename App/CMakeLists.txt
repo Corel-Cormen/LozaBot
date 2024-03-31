@@ -1,3 +1,4 @@
+add_subdirectory(3rdparty)
 add_subdirectory(QtWrappers)
 add_subdirectory(RequestDriver)
 

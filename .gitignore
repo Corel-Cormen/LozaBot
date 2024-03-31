@@ -1,5 +1,7 @@
 # build directory
 build/
+build_debug/
+build_release/
 
 # Qt user files
 CMakeLists.txt.user
