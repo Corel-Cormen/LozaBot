@@ -1,6 +1,7 @@
 add_subdirectory(3rdparty)
 add_subdirectory(QtWrappers)
 add_subdirectory(RequestDriver)
+add_subdirectory(RequestController)
 
 add_executable(LozaBot
     main.cpp
@@ -10,6 +11,7 @@ target_link_libraries(LozaBot
     Qt${QT_VERSION_MAJOR}::Core
     fmt
     RequestDriver
+    RequestController
 )
 
 set_target_properties(LozaBot PROPERTIES RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/LozaBot/bin")

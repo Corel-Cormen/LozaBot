@@ -1,11 +1,11 @@
-project(RequestDriverTest)
+project(RequestControllerTest)
 
-get_source_properties(RequestDriver)
+get_source_properties(RequestController)
 
 add_executable(${PROJECT_NAME}
     ${LIB_SOURCE}
-    RequestDriverTest.cpp
-    RequestCacheTest.cpp
+    RequestControllerTest.cpp
+    CookieFactoryTest.cpp
 )
 
 target_link_libraries(${PROJECT_NAME}

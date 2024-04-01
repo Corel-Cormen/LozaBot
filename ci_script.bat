@@ -101,7 +101,7 @@ if %ERRORLEVEL% equ 0 (
 SET coverage_report_txt=coverage_report.txt
 mkdir %coverage_report_path%
 gcovr -r .. ^
---txt-metric branch ^
+--txt-metric line ^
 --exclude-throw-branches ^
 %filter_coverage_command% > %coverage_report_path%\%coverage_report_txt%
 type %coverage_report_path%\%coverage_report_txt%
@@ -121,6 +121,7 @@ if %actual_coverage% geq %coverage_threshold% (
 ECHO Generate coverage to html report
 gcovr -r .. ^
 --exclude-throw-branches ^
+--decisions ^
 %filter_coverage_command% ^
 --html-nested %coverage_report_path%\index.html
 
