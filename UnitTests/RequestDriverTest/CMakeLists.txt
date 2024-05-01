@@ -5,7 +5,6 @@ get_source_properties(RequestDriver)
 add_executable(${PROJECT_NAME}
     ${LIB_SOURCE}
     RequestDriverTest.cpp
-    RequestCacheTest.cpp
 )
 
 target_link_libraries(${PROJECT_NAME}

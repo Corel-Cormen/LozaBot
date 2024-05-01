@@ -115,11 +115,10 @@ TEST_F(RequestDriverTest, GETRequestSuccessWithEmptyResponse)
     EXPECT_CALL(mockNetworkManager, get).WillOnce(Return(&reply));
     EXPECT_CALL(mockEventLoop, exec).WillOnce(Return(0));
 
-    EXPECT_EQ(Error_Code_T::SUCCESS, driver.GET(url));
+    ASSERT_EQ(Error_Code_T::SUCCESS, driver.GET(url));
 
-    RequestDriver::MetadataList headersList;
-    EXPECT_FALSE(driver.getResponseHeader(headersList));
-    EXPECT_TRUE(headersList.isEmpty());
+    const RequestDriver::MetadataList* header;
+    EXPECT_EQ(Error_Code_T::ZELOLENGTH, driver.getResponseHeader(header));
 }
 
 TEST_F(RequestDriverTest, GETRequestSuccessWithResponse)
@@ -134,17 +133,17 @@ TEST_F(RequestDriverTest, GETRequestSuccessWithResponse)
     EXPECT_CALL(mockNetworkManager, get).WillOnce(Return(&reply));
     EXPECT_CALL(mockEventLoop, exec).WillOnce(Return(0));
 
-    EXPECT_EQ(Error_Code_T::SUCCESS, driver.GET(url));
+    ASSERT_EQ(Error_Code_T::SUCCESS, driver.GET(url));
 
-    RequestDriver::MetadataList headersList;
-    EXPECT_TRUE(driver.getResponseHeader(headersList));
-    EXPECT_FALSE(headersList.isEmpty());
-    ASSERT_EQ(1, headersList.length());
-    EXPECT_EQ(metadataHeader, headersList.at(0).first);
-    EXPECT_EQ(dataHeader, headersList.at(0).second);
+    const RequestDriver::MetadataList* header;
+    EXPECT_EQ(Error_Code_T::SUCCESS, driver.getResponseHeader(header));
+    EXPECT_FALSE(header->isEmpty());
+    ASSERT_EQ(1, header->length());
+    EXPECT_EQ(metadataHeader, header->at(0).first);
+    EXPECT_EQ(dataHeader, header->at(0).second);
 }
 
-TEST_F(RequestDriverTest, GETRequestSuccessWithResponseMoveTest)
+TEST_F(RequestDriverTest, GETRequestSuccessNoDeleteMessageTest)
 {
     QNetworkReplyBridge reply;
     reply.setError(QNetworkReply::NoError, "QNetworkReply::NoError");
@@ -156,10 +155,18 @@ TEST_F(RequestDriverTest, GETRequestSuccessWithResponseMoveTest)
 
     EXPECT_EQ(Error_Code_T::SUCCESS, driver.GET(url));
 
-    RequestDriver::MetadataList headersList;
-    EXPECT_TRUE(driver.getResponseHeader(headersList));
-    EXPECT_FALSE(headersList.isEmpty());
+    const RequestDriver::MetadataList* header;
+    EXPECT_EQ(Error_Code_T::SUCCESS, driver.getResponseHeader(header));
+    EXPECT_FALSE(header->isEmpty());
+    ASSERT_EQ(1, header->length());
 
-    EXPECT_FALSE(driver.getResponseHeader(headersList));
-    EXPECT_TRUE(headersList.isEmpty());
+    EXPECT_EQ(Error_Code_T::SUCCESS, driver.getResponseHeader(header));
+    EXPECT_FALSE(header->isEmpty());
+    ASSERT_EQ(1, header->length());
+}
+
+TEST_F(RequestDriverTest, getResponseWhenRequestNotExecute)
+{
+    const RequestDriver::MetadataList* header;
+    EXPECT_EQ(Error_Code_T::NULLPTR, driver.getResponseHeader(header));
 }

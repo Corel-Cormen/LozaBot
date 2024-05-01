@@ -30,21 +30,33 @@ TEST_F(RequestControllerTest, enterStartWebsiteRequestGetError)
 
 TEST_F(RequestControllerTest, enterStartWebsiteResponseHeaderIsEmpty)
 {
-    EXPECT_CALL(requestDrv, GET).WillOnce(Return(Error_Code_T::SUCCESS));
-    EXPECT_CALL(requestDrv, getResponseHeader).WillOnce(Return(false));
+   EXPECT_CALL(requestDrv, GET).WillOnce(Return(Error_Code_T::SUCCESS));
+   const RequestDriverInterface::MetadataList headersList;
+   EXPECT_CALL(requestDrv, getResponseHeader).WillOnce(
+               DoAll(SetArgReferee<0>(&headersList), Return(Error_Code_T::ZELOLENGTH)));
 
-    EXPECT_EQ(Error_Code_T::ZELOLENGTH, requestController.enterStartWebsite());
+   EXPECT_EQ(Error_Code_T::ZELOLENGTH, requestController.enterStartWebsite());
+}
+
+TEST_F(RequestControllerTest, enterStartWebsiteResponseHeaderIsNullptr)
+{
+   EXPECT_CALL(requestDrv, GET).WillOnce(Return(Error_Code_T::SUCCESS));
+   EXPECT_CALL(requestDrv, getResponseHeader).WillOnce(
+               DoAll(SetArgReferee<0>(nullptr), Return(Error_Code_T::SUCCESS)));
+
+   EXPECT_EQ(Error_Code_T::ZELOLENGTH, requestController.enterStartWebsite());
 }
 
 TEST_F(RequestControllerTest, enterStartWebsiteResponseCookieParseSuccesfully)
 {
-    RequestDriverInterface::MetadataList headersList;
-    headersList.append(QPair{"metadata", "data"});
-    headersList.append(QPair{"Set-Cookie", "cookieMetadata=cookieData"});
+   const RequestDriverInterface::MetadataList headersList{
+       {"metadata", "data"},
+       {"Set-Cookie", "cookieMetadata=cookieData"}
+   };
 
-    EXPECT_CALL(requestDrv, GET).WillOnce(Return(Error_Code_T::SUCCESS));
-    EXPECT_CALL(requestDrv, getResponseHeader)
-            .WillOnce(DoAll(SetArgReferee<0>(headersList), Return(true)));
+   EXPECT_CALL(requestDrv, GET).WillOnce(Return(Error_Code_T::SUCCESS));
+   EXPECT_CALL(requestDrv, getResponseHeader)
+           .WillOnce(DoAll(SetArgReferee<0>(&headersList), Return(Error_Code_T::SUCCESS)));
 
-    EXPECT_EQ(Error_Code_T::SUCCESS, requestController.enterStartWebsite());
+   EXPECT_EQ(Error_Code_T::SUCCESS, requestController.enterStartWebsite());
 }

@@ -4,6 +4,10 @@
 
 #include "CommonTypes.hpp"
 
+template<typename T> class QList;
+template<typename T1, typename T2> class QPair;
+class QByteArray;
+
 class RequestDriverInterface : public QObject
 {
     Q_OBJECT
@@ -16,6 +20,6 @@ public:
 
     [[nodiscard]] virtual Error_Code_T GET(const QUrl& url) = 0;
 
-    typedef QList<QPair<QString, QString>> MetadataList;
-    virtual bool getResponseHeader(MetadataList& header) = 0;
+    typedef QList<QPair<QByteArray, QByteArray>> MetadataList;
+    virtual Error_Code_T getResponseHeader(const MetadataList*& header) = 0;
 };

@@ -25,11 +25,11 @@ Error_Code_T RequestController::enterStartWebsite()
     {
         fmt::println("enter website GET request send and parse success");
 
-        RequestDriverInterface::MetadataList headersList;
-        bool resultHeader = requestDrv.getResponseHeader(headersList);
-        if(resultHeader)
+        const RequestDriverInterface::MetadataList* headersList{nullptr};
+        Error_Code_T resultHeader = requestDrv.getResponseHeader(headersList);
+        if((resultHeader == Error_Code_T::SUCCESS) && (headersList != nullptr))
         {
-            foreach(auto header, headersList)
+            foreach(auto header, *headersList)
             {
                 if(header.first == "Set-Cookie")
                 {

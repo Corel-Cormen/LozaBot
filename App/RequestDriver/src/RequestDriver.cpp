@@ -2,20 +2,13 @@
 #include <fmt/core.h>
 
 #include "RequestDriver.hpp"
-#include "RequestCache.hpp"
 
 RequestDriver::RequestDriver(QEventLoopWrapper& _eventLoop,
                              QNetworkAccessManagerWrapper& _networkManager) :
     networkManager(_networkManager),
-    eventLoop(_eventLoop),
-    requestCache(new RequestCache)
+    eventLoop(_eventLoop)
 {
 
-}
-
-RequestDriver::~RequestDriver()
-{
-    delete requestCache;
 }
 
 Error_Code_T RequestDriver::GET(const QUrl& url)
@@ -74,7 +67,7 @@ Error_Code_T RequestDriver::receiveResponse()
         if(int httpCode = networkReply->attribute(QNetworkRequest::HttpStatusCodeAttribute).toInt();
                 httpCode == 200)
         {
-            status = wrapHeader();
+            status = Error_Code_T::SUCCESS;
         }
         else
         {
@@ -92,32 +85,21 @@ Error_Code_T RequestDriver::receiveResponse()
     return status;
 }
 
-Error_Code_T RequestDriver::wrapHeader()
+Error_Code_T RequestDriver::getResponseHeader(const MetadataList*& header)
 {
-    if(requestCache == nullptr)
+    if(networkReply == nullptr)
     {
         return Error_Code_T::NULLPTR;
     }
 
-    foreach(auto headerField, networkReply->rawHeaderPairs())
-    {
-        requestCache->putHeader(headerField.first, headerField.second);
-    }
+    header = &networkReply->rawHeaderPairs();
 
-    return Error_Code_T::SUCCESS;
-}
-
-bool RequestDriver::getResponseHeader(MetadataList& header)
-{
-    auto moveHeader = requestCache->getHeaders();
-    if(moveHeader.has_value())
+    if(header->length())
     {
-        header = moveHeader.value();
-        return true;
+        return Error_Code_T::SUCCESS;
     }
     else
     {
-        header.clear();
-        return false;
+        return Error_Code_T::ZELOLENGTH;
     }
 }
