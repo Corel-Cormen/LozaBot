@@ -1,12 +1,11 @@
 #include <gtest/gtest.h>
 
-#include "CookieStorage.hpp"
+#include "CookieFactory.hpp"
 
 namespace
 {
 
-template<typename T>
-void compare(const CookieStorage<T>& soragePattern, const CookieStorage<T>& storageItem)
+void compare(const CookieStorage& soragePattern, const CookieStorage& storageItem)
 {
     EXPECT_STREQ(soragePattern.metadata.toStdString().c_str(), storageItem.metadata.toStdString().c_str());
     EXPECT_STREQ(soragePattern.data.toStdString().c_str(), storageItem.data.toStdString().c_str());
@@ -18,11 +17,10 @@ void compare(const CookieStorage<T>& soragePattern, const CookieStorage<T>& stor
     EXPECT_EQ(soragePattern.httpOnly, storageItem.httpOnly);
 }
 
-template<typename T>
-T createCookieRawData(const CookieStorage<T>& pattern, bool isUpperFields)
+QByteArray createCookieRawData(const CookieStorage& pattern, bool isUpperFields)
 {
-    const T delimiter = "; ";
-    auto convertField = [isUpperFields](const T field) -> T {
+    const QByteArray delimiter = "; ";
+    auto convertField = [isUpperFields](const QByteArray field) -> QByteArray {
         if(isUpperFields)
         {
             return field;
@@ -33,19 +31,19 @@ T createCookieRawData(const CookieStorage<T>& pattern, bool isUpperFields)
         }
     };
 
-    T result = pattern.metadata + "=" + pattern.data + delimiter;
-    result += (convertField("Path") + "=" + pattern.path + delimiter);
+    QByteArray result = QString(pattern.metadata + '=' + pattern.data + delimiter).toUtf8();
+    result += (convertField("Path") + "=" + pattern.path + delimiter).toUtf8();
     if(!pattern.expires.isEmpty())
     {
-        result += (convertField("Expires") + "=" + pattern.expires + delimiter);
+        result += (convertField("Expires") + "=" + pattern.expires + delimiter).toUtf8();
     }
     if(!pattern.domain.isEmpty())
     {
-        result += (convertField("Domain") + "=" + pattern.domain + delimiter);
+        result += (convertField("Domain") + "=" + pattern.domain + delimiter).toUtf8();
     }
     if(pattern.maxAge != 0)
     {
-        result += (convertField("Max-Age") + "=" + T::number(pattern.maxAge) + delimiter);
+        result += (convertField("Max-Age") + "=" + QByteArray::number(pattern.maxAge) + delimiter);
     }
     if(pattern.secure)
     {
@@ -66,7 +64,7 @@ T createCookieRawData(const CookieStorage<T>& pattern, bool isUpperFields)
 
 } // end namespace
 
-typedef QList<QPair<CookieStorage<QString>, bool>> CookieStorageTestType;
+typedef QList<QPair<CookieStorage, bool>> CookieStorageTestType;
 class DataFactoryPositiveTest : public ::testing::TestWithParam<CookieStorageTestType>
 {
 
@@ -75,7 +73,7 @@ class DataFactoryPositiveTest : public ::testing::TestWithParam<CookieStorageTes
 TEST_P(DataFactoryPositiveTest, factoryTest)
 {
     auto cookieStorageList = GetParam();
-    QString cookieRawData;
+    QByteArray cookieRawData;
     foreach(const auto& cookieTestPair, cookieStorageList)
     {
         if(!cookieRawData.isEmpty())
@@ -85,7 +83,7 @@ TEST_P(DataFactoryPositiveTest, factoryTest)
         cookieRawData += createCookieRawData(cookieTestPair.first, cookieTestPair.second);
     }
 
-    QList<CookieStorage<QString>> cookieStorageResult = CookiesFactory::createCookieStorage(std::move(cookieRawData));
+    QList<CookieStorage> cookieStorageResult = CookiesFactory::createCookieStorage(cookieRawData);
     ASSERT_EQ(cookieStorageList.length(), cookieStorageResult.length());
     for(int i = 0; i < cookieStorageResult.length(); ++i)
     {
@@ -96,7 +94,7 @@ TEST_P(DataFactoryPositiveTest, factoryTest)
 INSTANTIATE_TEST_SUITE_P(DataFactoryParamTest, DataFactoryPositiveTest,
      ::testing::Values(
         CookieStorageTestType{
-            {CookieStorage<QString>{
+            {CookieStorage {
                 .metadata = "metadata",
                 .data = "data",
                 .path = "path",
@@ -108,7 +106,7 @@ INSTANTIATE_TEST_SUITE_P(DataFactoryParamTest, DataFactoryPositiveTest,
             }, true}
          },
          CookieStorageTestType{
-            {CookieStorage<QString>{
+            {CookieStorage {
                 .metadata = "metadata",
                 .data = "data",
                 .path = "path",
@@ -120,7 +118,7 @@ INSTANTIATE_TEST_SUITE_P(DataFactoryParamTest, DataFactoryPositiveTest,
             }, false}
          },
          CookieStorageTestType{
-            {CookieStorage<QString>{
+            {CookieStorage {
                 .metadata = "metadata",
                 .data = "data",
                 .path = "path",
@@ -130,7 +128,7 @@ INSTANTIATE_TEST_SUITE_P(DataFactoryParamTest, DataFactoryPositiveTest,
                 .secure = true,
                 .httpOnly = true
             }, true},
-            {CookieStorage<QString>{
+            {CookieStorage {
                 .metadata = "metadata",
                 .data = "data",
                 .path = "path",
@@ -142,7 +140,7 @@ INSTANTIATE_TEST_SUITE_P(DataFactoryParamTest, DataFactoryPositiveTest,
             }, false},
         },
         CookieStorageTestType{
-            {CookieStorage<QString>{
+            {CookieStorage {
                 .metadata = "metadata",
                 .data = "data",
                 .domain = "domain",
@@ -153,7 +151,7 @@ INSTANTIATE_TEST_SUITE_P(DataFactoryParamTest, DataFactoryPositiveTest,
             }, false}
         },
         CookieStorageTestType{
-            {CookieStorage<QString>{
+            {CookieStorage {
                 .metadata = "metadata",
                 .data = "data",
                 .path = "path",
@@ -164,7 +162,7 @@ INSTANTIATE_TEST_SUITE_P(DataFactoryParamTest, DataFactoryPositiveTest,
             }, false}
         },
         CookieStorageTestType{
-            {CookieStorage<QString>{
+            {CookieStorage {
                 .metadata = "metadata",
                 .data = "data",
                 .path = "path",
@@ -175,7 +173,7 @@ INSTANTIATE_TEST_SUITE_P(DataFactoryParamTest, DataFactoryPositiveTest,
             }, false}
         },
         CookieStorageTestType{
-            {CookieStorage<QString>{
+            {CookieStorage {
                 .metadata = "metadata",
                 .data = "data",
                 .path = "path",
@@ -187,7 +185,7 @@ INSTANTIATE_TEST_SUITE_P(DataFactoryParamTest, DataFactoryPositiveTest,
             }, false}
         },
         CookieStorageTestType{
-            {CookieStorage<QString>{
+            {CookieStorage {
                 .metadata = "metadata",
                 .data = "data",
                 .path = "path",
@@ -199,7 +197,7 @@ INSTANTIATE_TEST_SUITE_P(DataFactoryParamTest, DataFactoryPositiveTest,
             }, false}
         },
         CookieStorageTestType{
-            {CookieStorage<QString>{
+            {CookieStorage {
                 .metadata = "metadata",
                 .data = "data",
                 .path = "path",
@@ -220,14 +218,14 @@ class DataFactoryNegativeTest : public ::testing::Test
 
 TEST_F(DataFactoryNegativeTest, parseEmptyRawData)
 {
-    QString emptyStr;
-    auto result = CookiesFactory::createCookieStorage(std::move(emptyStr));
+    QByteArray emptyStr;
+    auto result = CookiesFactory::createCookieStorage(emptyStr);
     EXPECT_EQ(0, result.length());
 }
 
 TEST_F(DataFactoryNegativeTest, metadataParseNotSupported)
 {
-    CookieStorage<QString> cookie = {
+    CookieStorage cookie = {
         .metadata = "metadata",
         .data = "data",
         .path = "path",
@@ -237,17 +235,17 @@ TEST_F(DataFactoryNegativeTest, metadataParseNotSupported)
         .secure = true,
         .httpOnly = true
     };
-    QString cookieRawData = createCookieRawData(cookie, false);
+    QByteArray cookieRawData = createCookieRawData(cookie, false);
     cookieRawData += "; AddingMetadata";
 
-    auto result = CookiesFactory::createCookieStorage(std::move(cookieRawData));
-    EXPECT_EQ(1, result.length());
+    auto result = CookiesFactory::createCookieStorage(cookieRawData);
+    ASSERT_EQ(1, result.length());
     compare(cookie, result.at(0));
 }
 
 TEST_F(DataFactoryNegativeTest, metadataAndDataParseNotSupported)
 {
-    CookieStorage<QString> cookie = {
+    CookieStorage cookie = {
         .metadata = "metadata",
         .data = "data",
         .path = "path",
@@ -257,10 +255,10 @@ TEST_F(DataFactoryNegativeTest, metadataAndDataParseNotSupported)
         .secure = true,
         .httpOnly = true
     };
-    QString cookieRawData = createCookieRawData(cookie, false);
+    QByteArray cookieRawData = createCookieRawData(cookie, false);
     cookieRawData += "; AddingMetadata=AddingData";
 
-    auto result = CookiesFactory::createCookieStorage(std::move(cookieRawData));
-    EXPECT_EQ(1, result.length());
+    auto result = CookiesFactory::createCookieStorage(cookieRawData);
+    ASSERT_EQ(1, result.length());
     compare(cookie, result.at(0));
 }

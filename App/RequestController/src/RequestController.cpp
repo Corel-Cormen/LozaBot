@@ -2,18 +2,11 @@
 #include <fmt/core.h>
 
 #include "RequestController.hpp"
-#include "CookieCache.hpp"
 
 RequestController::RequestController(RequestDriverInterface& _requestDrv) :
-    requestDrv(_requestDrv),
-    cookieCache(new CookieCache)
+    requestDrv(_requestDrv)
 {
 
-}
-
-RequestController::~RequestController()
-{
-    delete cookieCache;
 }
 
 Error_Code_T RequestController::enterStartWebsite()
@@ -29,11 +22,11 @@ Error_Code_T RequestController::enterStartWebsite()
         Error_Code_T resultHeader = requestDrv.getResponseHeader(headersList);
         if((resultHeader == Error_Code_T::SUCCESS) && (headersList != nullptr))
         {
-            foreach(auto header, *headersList)
+            foreach(const auto& header, *headersList)
             {
                 if(header.first == "Set-Cookie")
                 {
-                    cookieCache->parseCookies(std::move(header.second));
+                    cookieCache.updateCookies(header.second);
                 }
             }
         }

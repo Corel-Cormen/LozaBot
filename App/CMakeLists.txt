@@ -2,6 +2,7 @@ add_subdirectory(3rdparty)
 add_subdirectory(QtWrappers)
 add_subdirectory(RequestDriver)
 add_subdirectory(RequestController)
+add_subdirectory(RequestDataCache)
 
 add_executable(LozaBot
     main.cpp

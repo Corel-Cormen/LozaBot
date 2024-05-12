@@ -1,10 +1,11 @@
-project(RequestControllerTest)
+project(RequestDataCacheTest)
 
-get_source_properties(RequestController)
+get_source_properties(RequestDataCache)
 
 add_executable(${PROJECT_NAME}
     ${LIB_SOURCE}
-    RequestControllerTest.cpp
+    RequestDataCacheTest.cpp
+    CookieFactoryTest.cpp
 )
 
 target_link_libraries(${PROJECT_NAME}

@@ -27,3 +27,4 @@ set(GTEST_LIBS
 
 add_subdirectory(RequestDriverTest)
 add_subdirectory(RequestControllerTest)
+add_subdirectory(RequestDataCacheTest)

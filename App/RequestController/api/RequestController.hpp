@@ -2,15 +2,14 @@
 
 #include "RequestControllerInterface.hpp"
 #include "RequestDriverInterface.hpp"
-
-class CookieCache;
+#include "RequestDataCache.hpp"
 
 class RequestController : public RequestControllerInterface
 {
 public:
     explicit RequestController(RequestDriverInterface& _requestDrv);
 
-    virtual ~RequestController();
+    virtual ~RequestController() = default;
 
     virtual Error_Code_T enterStartWebsite() override;
 
@@ -18,5 +17,5 @@ private:
 
     RequestDriverInterface& requestDrv;
 
-    CookieCache* cookieCache;
+    RequestDataCache cookieCache;
 };

@@ -47,6 +47,15 @@ TEST_F(RequestControllerTest, enterStartWebsiteResponseHeaderIsNullptr)
    EXPECT_EQ(Error_Code_T::ZELOLENGTH, requestController.enterStartWebsite());
 }
 
+TEST_F(RequestControllerTest, enterStartWebsiteResponseHeaderIsNullptrAndResultIsError)
+{
+   EXPECT_CALL(requestDrv, GET).WillOnce(Return(Error_Code_T::SUCCESS));
+   EXPECT_CALL(requestDrv, getResponseHeader).WillOnce(
+               DoAll(SetArgReferee<0>(nullptr), Return(Error_Code_T::ERROR)));
+
+   EXPECT_EQ(Error_Code_T::ZELOLENGTH, requestController.enterStartWebsite());
+}
+
 TEST_F(RequestControllerTest, enterStartWebsiteResponseCookieParseSuccesfully)
 {
    const RequestDriverInterface::MetadataList headersList{
