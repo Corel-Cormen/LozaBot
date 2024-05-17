@@ -1,28 +1,17 @@
 #pragma once
 
-#include <QtGlobal>
-#include <QByteArray>
-#include <QList>
-
-struct CookieStorage
-{
-    QString metadata;
-    QString data;
-    QString path;
-    QString domain;
-    QString expires;
-    quint32 maxAge;
-    bool secure;
-    bool httpOnly;
-};
+class QByteArray;
+struct CookieStorage;
 
 class RequestDataCache
 {
 public:
     RequestDataCache();
 
-    void updateCookies(QByteArray cookiesData);
+    virtual ~RequestDataCache();
+
+    void updateCookies(const QByteArray& cookiesData);
 
 private:
-    QList<CookieStorage> cookiesStorage{};
+    CookieStorage* cookiesStorage;
 };

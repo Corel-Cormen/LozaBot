@@ -6,6 +6,7 @@ add_executable(${PROJECT_NAME}
     ${LIB_SOURCE}
     RequestDataCacheTest.cpp
     CookieFactoryTest.cpp
+    CookieStorageTest.cpp
 )
 
 target_link_libraries(${PROJECT_NAME}

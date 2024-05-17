@@ -1,9 +1,10 @@
 #include "CookieFactory.hpp"
+#include "CookieStorage.hpp"
 #include "fmt/core.h"
 
-QList<CookieStorage> CookiesFactory::createCookieStorage(const QByteArray& cookieData)
+QList<CookieData> CookiesFactory::createCookieStorage(const QByteArray& cookieData)
 {
-    QList<CookieStorage> resultFactoryList;
+    QList<CookieData> resultFactoryList;
 
     if(cookieData.isEmpty())
     {
@@ -13,7 +14,7 @@ QList<CookieStorage> CookiesFactory::createCookieStorage(const QByteArray& cooki
     foreach(const QString& cookie, convert2StringList(cookieData.split('\n')))
     {
         QList<QString> fieldCookie = cookie.split("; ");
-        CookieStorage resultFactory{};
+        CookieData resultFactory{};
 
         assignMetadataAndData(fieldCookie, resultFactory);
         searchAndMarkCookieField(fieldCookie, "Secure", resultFactory.secure);
@@ -48,7 +49,7 @@ QStringList CookiesFactory::convert2StringList(const QList<QByteArray>& list)
     return result;
 }
 
-void CookiesFactory::assignMetadataAndData(QList<QString>& fieldCookie, CookieStorage& resultFactory)
+void CookiesFactory::assignMetadataAndData(QList<QString>& fieldCookie, CookieData& resultFactory)
 {
     QList<QString> dataAndMetadataCookie = fieldCookie.at(0).split('=');
     resultFactory.metadata = dataAndMetadataCookie.at(0);
@@ -80,7 +81,7 @@ int CookiesFactory::findNameField(QList<QString>& fieldCookie, QString field)
     return findResult;
 }
 
-void CookiesFactory::assignMetadata(CookieStorage& fieldCookie, const QString& metadata, const QString& data)
+void CookiesFactory::assignMetadata(CookieData& fieldCookie, const QString& metadata, const QString& data)
 {
     if((metadata == "Path") || (metadata == "path"))
     {

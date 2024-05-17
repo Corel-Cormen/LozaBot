@@ -1,11 +1,12 @@
 #include <gtest/gtest.h>
 
 #include "CookieFactory.hpp"
+#include "CookieStorage.hpp"
 
 namespace
 {
 
-void compare(const CookieStorage& soragePattern, const CookieStorage& storageItem)
+void compare(const CookieData& soragePattern, const CookieData& storageItem)
 {
     EXPECT_STREQ(soragePattern.metadata.toStdString().c_str(), storageItem.metadata.toStdString().c_str());
     EXPECT_STREQ(soragePattern.data.toStdString().c_str(), storageItem.data.toStdString().c_str());
@@ -17,7 +18,7 @@ void compare(const CookieStorage& soragePattern, const CookieStorage& storageIte
     EXPECT_EQ(soragePattern.httpOnly, storageItem.httpOnly);
 }
 
-QByteArray createCookieRawData(const CookieStorage& pattern, bool isUpperFields)
+QByteArray createCookieRawData(const CookieData& pattern, bool isUpperFields)
 {
     const QByteArray delimiter = "; ";
     auto convertField = [isUpperFields](const QByteArray field) -> QByteArray {
@@ -64,7 +65,7 @@ QByteArray createCookieRawData(const CookieStorage& pattern, bool isUpperFields)
 
 } // end namespace
 
-typedef QList<QPair<CookieStorage, bool>> CookieStorageTestType;
+typedef QList<QPair<CookieData, bool>> CookieStorageTestType;
 class DataFactoryPositiveTest : public ::testing::TestWithParam<CookieStorageTestType>
 {
 
@@ -83,7 +84,7 @@ TEST_P(DataFactoryPositiveTest, factoryTest)
         cookieRawData += createCookieRawData(cookieTestPair.first, cookieTestPair.second);
     }
 
-    QList<CookieStorage> cookieStorageResult = CookiesFactory::createCookieStorage(cookieRawData);
+    QList<CookieData> cookieStorageResult = CookiesFactory::createCookieStorage(cookieRawData);
     ASSERT_EQ(cookieStorageList.length(), cookieStorageResult.length());
     for(int i = 0; i < cookieStorageResult.length(); ++i)
     {
@@ -94,7 +95,7 @@ TEST_P(DataFactoryPositiveTest, factoryTest)
 INSTANTIATE_TEST_SUITE_P(DataFactoryParamTest, DataFactoryPositiveTest,
      ::testing::Values(
         CookieStorageTestType{
-            {CookieStorage {
+            {CookieData {
                 .metadata = "metadata",
                 .data = "data",
                 .path = "path",
@@ -106,7 +107,7 @@ INSTANTIATE_TEST_SUITE_P(DataFactoryParamTest, DataFactoryPositiveTest,
             }, true}
          },
          CookieStorageTestType{
-            {CookieStorage {
+            {CookieData {
                 .metadata = "metadata",
                 .data = "data",
                 .path = "path",
@@ -118,7 +119,7 @@ INSTANTIATE_TEST_SUITE_P(DataFactoryParamTest, DataFactoryPositiveTest,
             }, false}
          },
          CookieStorageTestType{
-            {CookieStorage {
+            {CookieData {
                 .metadata = "metadata",
                 .data = "data",
                 .path = "path",
@@ -128,7 +129,7 @@ INSTANTIATE_TEST_SUITE_P(DataFactoryParamTest, DataFactoryPositiveTest,
                 .secure = true,
                 .httpOnly = true
             }, true},
-            {CookieStorage {
+            {CookieData {
                 .metadata = "metadata",
                 .data = "data",
                 .path = "path",
@@ -140,7 +141,7 @@ INSTANTIATE_TEST_SUITE_P(DataFactoryParamTest, DataFactoryPositiveTest,
             }, false},
         },
         CookieStorageTestType{
-            {CookieStorage {
+            {CookieData {
                 .metadata = "metadata",
                 .data = "data",
                 .domain = "domain",
@@ -151,7 +152,7 @@ INSTANTIATE_TEST_SUITE_P(DataFactoryParamTest, DataFactoryPositiveTest,
             }, false}
         },
         CookieStorageTestType{
-            {CookieStorage {
+            {CookieData {
                 .metadata = "metadata",
                 .data = "data",
                 .path = "path",
@@ -162,7 +163,7 @@ INSTANTIATE_TEST_SUITE_P(DataFactoryParamTest, DataFactoryPositiveTest,
             }, false}
         },
         CookieStorageTestType{
-            {CookieStorage {
+            {CookieData {
                 .metadata = "metadata",
                 .data = "data",
                 .path = "path",
@@ -173,7 +174,7 @@ INSTANTIATE_TEST_SUITE_P(DataFactoryParamTest, DataFactoryPositiveTest,
             }, false}
         },
         CookieStorageTestType{
-            {CookieStorage {
+            {CookieData {
                 .metadata = "metadata",
                 .data = "data",
                 .path = "path",
@@ -185,7 +186,7 @@ INSTANTIATE_TEST_SUITE_P(DataFactoryParamTest, DataFactoryPositiveTest,
             }, false}
         },
         CookieStorageTestType{
-            {CookieStorage {
+            {CookieData {
                 .metadata = "metadata",
                 .data = "data",
                 .path = "path",
@@ -197,7 +198,7 @@ INSTANTIATE_TEST_SUITE_P(DataFactoryParamTest, DataFactoryPositiveTest,
             }, false}
         },
         CookieStorageTestType{
-            {CookieStorage {
+            {CookieData {
                 .metadata = "metadata",
                 .data = "data",
                 .path = "path",
@@ -225,7 +226,7 @@ TEST_F(DataFactoryNegativeTest, parseEmptyRawData)
 
 TEST_F(DataFactoryNegativeTest, metadataParseNotSupported)
 {
-    CookieStorage cookie = {
+    CookieData cookie = {
         .metadata = "metadata",
         .data = "data",
         .path = "path",
@@ -245,7 +246,7 @@ TEST_F(DataFactoryNegativeTest, metadataParseNotSupported)
 
 TEST_F(DataFactoryNegativeTest, metadataAndDataParseNotSupported)
 {
-    CookieStorage cookie = {
+    CookieData cookie = {
         .metadata = "metadata",
         .data = "data",
         .path = "path",
