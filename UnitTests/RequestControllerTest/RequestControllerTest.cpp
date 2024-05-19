@@ -19,13 +19,15 @@ public:
 protected:
     MockRequestDriver requestDrv;
     RequestController requestController;
+
+    QString url{"tmp/url/website"};
 };
 
 TEST_F(RequestControllerTest, enterStartWebsiteRequestGetError)
 {
     EXPECT_CALL(requestDrv, GET).WillOnce(Return(Error_Code_T::ERROR));
 
-    EXPECT_EQ(Error_Code_T::ERROR, requestController.enterStartWebsite());
+    EXPECT_EQ(Error_Code_T::ERROR, requestController.enterWebsite(url));
 }
 
 TEST_F(RequestControllerTest, enterStartWebsiteResponseHeaderIsEmpty)
@@ -35,7 +37,7 @@ TEST_F(RequestControllerTest, enterStartWebsiteResponseHeaderIsEmpty)
    EXPECT_CALL(requestDrv, getResponseHeader).WillOnce(
                DoAll(SetArgReferee<0>(&headersList), Return(Error_Code_T::ZELOLENGTH)));
 
-   EXPECT_EQ(Error_Code_T::ZELOLENGTH, requestController.enterStartWebsite());
+   EXPECT_EQ(Error_Code_T::ZELOLENGTH, requestController.enterWebsite(url));
 }
 
 TEST_F(RequestControllerTest, enterStartWebsiteResponseHeaderIsNullptr)
@@ -44,7 +46,7 @@ TEST_F(RequestControllerTest, enterStartWebsiteResponseHeaderIsNullptr)
    EXPECT_CALL(requestDrv, getResponseHeader).WillOnce(
                DoAll(SetArgReferee<0>(nullptr), Return(Error_Code_T::SUCCESS)));
 
-   EXPECT_EQ(Error_Code_T::ZELOLENGTH, requestController.enterStartWebsite());
+   EXPECT_EQ(Error_Code_T::ZELOLENGTH, requestController.enterWebsite(url));
 }
 
 TEST_F(RequestControllerTest, enterStartWebsiteResponseHeaderIsNullptrAndResultIsError)
@@ -53,7 +55,7 @@ TEST_F(RequestControllerTest, enterStartWebsiteResponseHeaderIsNullptrAndResultI
    EXPECT_CALL(requestDrv, getResponseHeader).WillOnce(
                DoAll(SetArgReferee<0>(nullptr), Return(Error_Code_T::ERROR)));
 
-   EXPECT_EQ(Error_Code_T::ZELOLENGTH, requestController.enterStartWebsite());
+   EXPECT_EQ(Error_Code_T::ZELOLENGTH, requestController.enterWebsite(url));
 }
 
 TEST_F(RequestControllerTest, enterStartWebsiteResponseCookieParseSuccesfully)
@@ -67,5 +69,5 @@ TEST_F(RequestControllerTest, enterStartWebsiteResponseCookieParseSuccesfully)
    EXPECT_CALL(requestDrv, getResponseHeader)
            .WillOnce(DoAll(SetArgReferee<0>(&headersList), Return(Error_Code_T::SUCCESS)));
 
-   EXPECT_EQ(Error_Code_T::SUCCESS, requestController.enterStartWebsite());
+   EXPECT_EQ(Error_Code_T::SUCCESS, requestController.enterWebsite(url));
 }

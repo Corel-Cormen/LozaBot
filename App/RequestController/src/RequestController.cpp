@@ -1,7 +1,8 @@
-#include <QUrl>
+#include <QNetworkRequest>
 #include <fmt/core.h>
 
 #include "RequestController.hpp"
+#include "JsonParser.hpp"
 
 RequestController::RequestController(RequestDriverInterface& _requestDrv) :
     requestDrv(_requestDrv)
@@ -9,10 +10,12 @@ RequestController::RequestController(RequestDriverInterface& _requestDrv) :
 
 }
 
-Error_Code_T RequestController::enterStartWebsite()
+Error_Code_T RequestController::enterWebsite(const QString& url)
 {
-    QUrl url{"https://www.zalando-lounge.pl/"};
-    Error_Code_T reqStatus = requestDrv.GET(url);
+    QByteArray jsonData = JsonParser::parseJson(cookieCache.getCookies());
+    QNetworkRequest request = JsonParser::parseRequest(url, jsonData);
+
+    Error_Code_T reqStatus = requestDrv.GET(request, jsonData);
 
     if(reqStatus == Error_Code_T::SUCCESS)
     {

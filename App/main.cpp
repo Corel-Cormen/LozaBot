@@ -25,7 +25,7 @@ int main(int argc, char *argv[])
 
     RequestControllerInterface& requestController = getRequestController();
 
-    requestController.enterStartWebsite();
+    requestController.enterWebsite("https://www.zalando-lounge.pl/#/");
 
     return a.exec();
 }

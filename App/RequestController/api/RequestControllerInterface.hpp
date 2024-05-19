@@ -2,6 +2,8 @@
 
 #include "CommonTypes.hpp"
 
+class QString;
+
 class RequestControllerInterface
 {
 public:
@@ -9,5 +11,5 @@ public:
 
     virtual ~RequestControllerInterface() = default;
 
-    virtual Error_Code_T enterStartWebsite() = 0;
+    virtual Error_Code_T enterWebsite(const QString& url) = 0;
 };

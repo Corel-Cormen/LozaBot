@@ -11,9 +11,9 @@ RequestDriver::RequestDriver(QEventLoopWrapper& _eventLoop,
 
 }
 
-Error_Code_T RequestDriver::GET(const QUrl& url)
+Error_Code_T RequestDriver::GET(const QNetworkRequest& request, const QByteArray& data)
 {
-    Error_Code_T status = configureGET(url);
+    Error_Code_T status = configureGET(request, data);
 
     if(status == Error_Code_T::SUCCESS)
     {
@@ -37,9 +37,9 @@ Error_Code_T RequestDriver::GET(const QUrl& url)
     return status;
 }
 
-Error_Code_T RequestDriver::configureGET(const QUrl& url)
+Error_Code_T RequestDriver::configureGET(const QNetworkRequest& request, const QByteArray& data)
 {
-    networkReply = networkManager.get(QNetworkRequest(url));
+    networkReply = networkManager.get(QNetworkRequest(request), data);
 
     bool connectResult = connect(networkReply,
                                  &QNetworkReply::finished,
@@ -48,12 +48,12 @@ Error_Code_T RequestDriver::configureGET(const QUrl& url)
 
     if(connectResult)
     {
-        fmt::println("request configured to: {}", url.toDisplayString().toStdString());
+        fmt::println("request configured to: {}", request.url().toDisplayString().toStdString());
         return Error_Code_T::SUCCESS;
     }
     else
     {
-        fmt::println("request error configured to: {}", url.toDisplayString().toStdString());
+        fmt::println("request error configured to: {}", request.url().toDisplayString().toStdString());
         return Error_Code_T::ERROR;
     }
 }

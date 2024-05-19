@@ -7,5 +7,5 @@
 class MockQNetworkAccessManagerWrapper : public QNetworkAccessManagerWrapper
 {
 public:
-    MOCK_METHOD(QNetworkReply*, get, (const QNetworkRequest& request), (override));
+    MOCK_METHOD(QNetworkReply*, get, (const QNetworkRequest& request, const QByteArray& data), (override));
 };

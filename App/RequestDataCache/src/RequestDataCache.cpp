@@ -21,3 +21,16 @@ void RequestDataCache::updateCookies(const QByteArray& cookiesData)
         cookiesStorage->update(cookie);
     }
 }
+
+QJsonObject RequestDataCache::getCookies() const
+{
+    QJsonObject json;
+
+    for(size_t i = 0; i < cookiesStorage->getSize(); ++i)
+    {
+        const CookieData cookie = cookiesStorage->getCookie(i);
+        json[cookie.metadata] = cookie.data;
+    }
+
+    return json;
+}

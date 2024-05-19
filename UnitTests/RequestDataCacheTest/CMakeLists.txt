@@ -4,9 +4,11 @@ get_source_properties(RequestDataCache)
 
 add_executable(${PROJECT_NAME}
     ${LIB_SOURCE}
+    JsonUtils.hpp
     RequestDataCacheTest.cpp
     CookieFactoryTest.cpp
     CookieStorageTest.cpp
+    JsonParserTest.cpp
 )
 
 target_link_libraries(${PROJECT_NAME}

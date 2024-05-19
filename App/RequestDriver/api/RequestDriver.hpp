@@ -15,13 +15,13 @@ public:
 
     virtual ~RequestDriver() = default;
 
-    virtual Error_Code_T GET(const QUrl& url) override;
+    virtual Error_Code_T GET(const QNetworkRequest& request, const QByteArray& data) override;
 
     virtual Error_Code_T getResponseHeader(const MetadataList*& header) override;
 
 private:
 
-    Error_Code_T configureGET(const QUrl& url);
+    Error_Code_T configureGET(const QNetworkRequest& url, const QByteArray& data);
 
     Error_Code_T receiveResponse();
 

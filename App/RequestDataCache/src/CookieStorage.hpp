@@ -23,6 +23,10 @@ public:
 
     void update(const CookieData& _cookie);
 
+    inline size_t getSize() const { return cookies.length(); }
+
+    inline const CookieData& getCookie(size_t position) const { return cookies[position]; }
+
 private:
     QList<CookieData> cookies;
 };

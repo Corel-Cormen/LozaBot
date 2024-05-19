@@ -11,7 +11,7 @@ public:
 
     virtual ~RequestController() = default;
 
-    virtual Error_Code_T enterStartWebsite() override;
+    virtual Error_Code_T enterWebsite(const QString& url) override;
 
 private:
 

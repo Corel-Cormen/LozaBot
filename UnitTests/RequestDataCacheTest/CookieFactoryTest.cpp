@@ -2,6 +2,7 @@
 
 #include "CookieFactory.hpp"
 #include "CookieStorage.hpp"
+#include "JsonUtils.hpp"
 
 namespace
 {
@@ -16,51 +17,6 @@ void compare(const CookieData& soragePattern, const CookieData& storageItem)
     EXPECT_EQ(soragePattern.maxAge, storageItem.maxAge);
     EXPECT_EQ(soragePattern.secure, storageItem.secure);
     EXPECT_EQ(soragePattern.httpOnly, storageItem.httpOnly);
-}
-
-QByteArray createCookieRawData(const CookieData& pattern, bool isUpperFields)
-{
-    const QByteArray delimiter = "; ";
-    auto convertField = [isUpperFields](const QByteArray field) -> QByteArray {
-        if(isUpperFields)
-        {
-            return field;
-        }
-        else
-        {
-            return field.toLower();
-        }
-    };
-
-    QByteArray result = QString(pattern.metadata + '=' + pattern.data + delimiter).toUtf8();
-    result += (convertField("Path") + "=" + pattern.path + delimiter).toUtf8();
-    if(!pattern.expires.isEmpty())
-    {
-        result += (convertField("Expires") + "=" + pattern.expires + delimiter).toUtf8();
-    }
-    if(!pattern.domain.isEmpty())
-    {
-        result += (convertField("Domain") + "=" + pattern.domain + delimiter).toUtf8();
-    }
-    if(pattern.maxAge != 0)
-    {
-        result += (convertField("Max-Age") + "=" + QByteArray::number(pattern.maxAge) + delimiter);
-    }
-    if(pattern.secure)
-    {
-        result += (convertField("Secure") + delimiter);
-    }
-    if(pattern.httpOnly)
-    {
-        result += (convertField("HttpOnly") + delimiter);
-    }
-
-    if((result.lastIndexOf(delimiter) + delimiter.length()) == result.length())
-    {
-        result.remove(result.lastIndexOf(delimiter), delimiter.length());
-    }
-
-    return result;
 }
 
 } // end namespace
@@ -81,7 +37,7 @@ TEST_P(DataFactoryPositiveTest, factoryTest)
         {
             cookieRawData += '\n';
         }
-        cookieRawData += createCookieRawData(cookieTestPair.first, cookieTestPair.second);
+        cookieRawData += JsonUtils::createCookieRawData(cookieTestPair.first, cookieTestPair.second);
     }
 
     QList<CookieData> cookieStorageResult = CookiesFactory::createCookieStorage(cookieRawData);
@@ -236,7 +192,7 @@ TEST_F(DataFactoryNegativeTest, metadataParseNotSupported)
         .secure = true,
         .httpOnly = true
     };
-    QByteArray cookieRawData = createCookieRawData(cookie, false);
+    QByteArray cookieRawData = JsonUtils::createCookieRawData(cookie, false);
     cookieRawData += "; AddingMetadata";
 
     auto result = CookiesFactory::createCookieStorage(cookieRawData);
@@ -256,7 +212,7 @@ TEST_F(DataFactoryNegativeTest, metadataAndDataParseNotSupported)
         .secure = true,
         .httpOnly = true
     };
-    QByteArray cookieRawData = createCookieRawData(cookie, false);
+    QByteArray cookieRawData = JsonUtils::createCookieRawData(cookie, false);
     cookieRawData += "; AddingMetadata=AddingData";
 
     auto result = CookiesFactory::createCookieStorage(cookieRawData);

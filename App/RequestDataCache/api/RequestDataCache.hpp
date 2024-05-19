@@ -1,5 +1,7 @@
 #pragma once
 
+#include <QJsonObject>
+
 class QByteArray;
 struct CookieStorage;
 
@@ -11,6 +13,8 @@ public:
     virtual ~RequestDataCache();
 
     void updateCookies(const QByteArray& cookiesData);
+
+    QJsonObject getCookies() const;
 
 private:
     CookieStorage* cookiesStorage;

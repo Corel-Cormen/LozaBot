@@ -7,6 +7,7 @@
 template<typename T> class QList;
 template<typename T1, typename T2> class QPair;
 class QByteArray;
+class QNetworkRequest;
 
 class RequestDriverInterface : public QObject
 {
@@ -18,7 +19,7 @@ public:
 
     virtual ~RequestDriverInterface() = default;
 
-    [[nodiscard]] virtual Error_Code_T GET(const QUrl& url) = 0;
+    [[nodiscard]] virtual Error_Code_T GET(const QNetworkRequest& request, const QByteArray& data) = 0;
 
     typedef QList<QPair<QByteArray, QByteArray>> MetadataList;
     virtual Error_Code_T getResponseHeader(const MetadataList*& header) = 0;

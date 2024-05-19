@@ -20,7 +20,8 @@ protected:
     MockQNetworkAccessManagerWrapper mockNetworkManager;
     RequestDriver driver;
 
-    QUrl url{"temp/url/obj"};
+    QNetworkRequest request{};
+    QByteArray requestData{};
 };
 
 class QNetworkReplyBridge : public QNetworkReply
@@ -70,7 +71,7 @@ TEST_F(RequestDriverTest, ConfigureRequestNoConnect)
 {
     EXPECT_CALL(mockNetworkManager, get).WillOnce(Return(nullptr));
 
-    EXPECT_EQ(Error_Code_T::ERROR, driver.GET(url));
+    EXPECT_EQ(Error_Code_T::ERROR, driver.GET(request, requestData));
 }
 
 TEST_F(RequestDriverTest, ExecuteRequestError)
@@ -80,7 +81,7 @@ TEST_F(RequestDriverTest, ExecuteRequestError)
     EXPECT_CALL(mockNetworkManager, get).WillOnce(Return(&reply));
     EXPECT_CALL(mockEventLoop, exec).WillOnce(Return(-1));
 
-    EXPECT_EQ(Error_Code_T::ERROR, driver.GET(url));
+    EXPECT_EQ(Error_Code_T::ERROR, driver.GET(request, requestData));
 }
 
 TEST_F(RequestDriverTest, NetworkReplyError)
@@ -91,7 +92,7 @@ TEST_F(RequestDriverTest, NetworkReplyError)
     EXPECT_CALL(mockNetworkManager, get).WillOnce(Return(&reply));
     EXPECT_CALL(mockEventLoop, exec).WillOnce(Return(0));
 
-    EXPECT_EQ(Error_Code_T::ERROR, driver.GET(url));
+    EXPECT_EQ(Error_Code_T::ERROR, driver.GET(request, requestData));
 }
 
 TEST_F(RequestDriverTest, NetworkReplyBadHttpCode)
@@ -103,7 +104,7 @@ TEST_F(RequestDriverTest, NetworkReplyBadHttpCode)
     EXPECT_CALL(mockNetworkManager, get).WillOnce(Return(&reply));
     EXPECT_CALL(mockEventLoop, exec).WillOnce(Return(0));
 
-    EXPECT_EQ(Error_Code_T::ERROR, driver.GET(url));
+    EXPECT_EQ(Error_Code_T::ERROR, driver.GET(request, requestData));
 }
 
 TEST_F(RequestDriverTest, GETRequestSuccessWithEmptyResponse)
@@ -115,7 +116,7 @@ TEST_F(RequestDriverTest, GETRequestSuccessWithEmptyResponse)
     EXPECT_CALL(mockNetworkManager, get).WillOnce(Return(&reply));
     EXPECT_CALL(mockEventLoop, exec).WillOnce(Return(0));
 
-    ASSERT_EQ(Error_Code_T::SUCCESS, driver.GET(url));
+    ASSERT_EQ(Error_Code_T::SUCCESS, driver.GET(request, requestData));
 
     const RequestDriver::MetadataList* header;
     EXPECT_EQ(Error_Code_T::ZELOLENGTH, driver.getResponseHeader(header));
@@ -133,7 +134,7 @@ TEST_F(RequestDriverTest, GETRequestSuccessWithResponse)
     EXPECT_CALL(mockNetworkManager, get).WillOnce(Return(&reply));
     EXPECT_CALL(mockEventLoop, exec).WillOnce(Return(0));
 
-    ASSERT_EQ(Error_Code_T::SUCCESS, driver.GET(url));
+    ASSERT_EQ(Error_Code_T::SUCCESS, driver.GET(request, requestData));
 
     const RequestDriver::MetadataList* header;
     EXPECT_EQ(Error_Code_T::SUCCESS, driver.getResponseHeader(header));
@@ -153,7 +154,7 @@ TEST_F(RequestDriverTest, GETRequestSuccessNoDeleteMessageTest)
     EXPECT_CALL(mockNetworkManager, get).WillOnce(Return(&reply));
     EXPECT_CALL(mockEventLoop, exec).WillOnce(Return(0));
 
-    EXPECT_EQ(Error_Code_T::SUCCESS, driver.GET(url));
+    EXPECT_EQ(Error_Code_T::SUCCESS, driver.GET(request, requestData));
 
     const RequestDriver::MetadataList* header;
     EXPECT_EQ(Error_Code_T::SUCCESS, driver.getResponseHeader(header));

@@ -38,5 +38,5 @@ include_directories(App/Common)
 add_subdirectory(App)
 
 if(${CMAKE_BUILD_TYPE} STREQUAL "Debug")
-    add_subdirectory(UnitTests)
+   add_subdirectory(UnitTests)
 endif()
