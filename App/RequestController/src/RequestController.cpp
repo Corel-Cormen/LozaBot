@@ -12,12 +12,13 @@ RequestController::RequestController(RequestDriverInterface& _requestDrv) :
 
 Error_Code_T RequestController::enterWebsite(const QString& url)
 {
+    Error_Code_T reqStatus = Error_Code_T::ERROR;
     QByteArray jsonData = JsonParser::parseJson(cookieCache.getCookies());
     QNetworkRequest request = JsonParser::parseRequest(url, jsonData);
 
-    Error_Code_T reqStatus = requestDrv.GET(request, jsonData);
+    RequestDriverInterface::RequestStatus reqCode = requestDrv.GET(request, jsonData);
 
-    if(reqStatus == Error_Code_T::SUCCESS)
+    if(reqCode == RequestDriverInterface::RequestStatus::OK)
     {
         fmt::println("enter website GET request send and parse success");
 
@@ -32,6 +33,7 @@ Error_Code_T RequestController::enterWebsite(const QString& url)
                     cookieCache.updateCookies(header.second);
                 }
             }
+            reqStatus = Error_Code_T::SUCCESS;
         }
         else
         {
@@ -41,7 +43,7 @@ Error_Code_T RequestController::enterWebsite(const QString& url)
     }
     else
     {
-        fmt::println("Request error code: {}", static_cast<int>(reqStatus));
+        fmt::println("Request error code: {}", static_cast<int>(reqCode));
     }
 
     return reqStatus;
