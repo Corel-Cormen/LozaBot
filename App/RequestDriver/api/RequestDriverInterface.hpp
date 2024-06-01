@@ -26,7 +26,7 @@ public:
     virtual ~RequestDriverInterface() = default;
 
     enum class RequestStatus;
-    [[nodiscard]] virtual RequestStatus GET(const QNetworkRequest& request, const QByteArray& data) = 0;
+    [[nodiscard]] virtual RequestStatus GET(const QNetworkRequest& request) = 0;
 
     typedef QList<QPair<QByteArray, QByteArray>> MetadataList;
     virtual Error_Code_T getResponseHeader(const MetadataList*& header) = 0;

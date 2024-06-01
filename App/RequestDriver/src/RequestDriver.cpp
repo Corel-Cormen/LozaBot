@@ -11,9 +11,9 @@ RequestDriver::RequestDriver(QEventLoopWrapper& _eventLoop,
 
 }
 
-RequestDriver::RequestStatus RequestDriver::GET(const QNetworkRequest& request, const QByteArray& data)
+RequestDriver::RequestStatus RequestDriver::GET(const QNetworkRequest& request)
 {
-    if(configureGET(request, data) == Error_Code_T::SUCCESS)
+    if(configureGET(request) == Error_Code_T::SUCCESS)
     {
         if(int reqExecResult = eventLoop.exec();
                 reqExecResult == 0)
@@ -36,14 +36,11 @@ RequestDriver::RequestStatus RequestDriver::GET(const QNetworkRequest& request, 
     return RequestStatus::REQUEST_STATUS_ERROR;
 }
 
-Error_Code_T RequestDriver::configureGET(const QNetworkRequest& request, const QByteArray& data)
+Error_Code_T RequestDriver::configureGET(const QNetworkRequest& request)
 {
-    networkReply = networkManager.get(QNetworkRequest(request), data);
+    networkReply = networkManager.get(request);
 
-    bool connectResult = connect(networkReply,
-                                 &QNetworkReply::finished,
-                                 &eventLoop,
-                                 &QEventLoopWrapper::quit);
+    bool connectResult = connect(networkReply, &QNetworkReply::finished, &eventLoop, &QEventLoopWrapper::quit);
 
     if(connectResult)
     {

@@ -8,8 +8,6 @@ class QString;
 namespace JsonParser
 {
 
-QByteArray parseJson(const QJsonObject& data);
-
-QNetworkRequest parseRequest(const QString& url, const QByteArray& jsonData);
+QNetworkRequest parseRequest(const QString& url, const QByteArray& cookieData);
 
 } // end namespace JsonParser

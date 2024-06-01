@@ -22,15 +22,20 @@ void RequestDataCache::updateCookies(const QByteArray& cookiesData)
     }
 }
 
-QJsonObject RequestDataCache::getCookies() const
+QByteArray RequestDataCache::getRawCookies() const
 {
-    QJsonObject json;
+    QByteArray cookiesArray{};
 
     for(size_t i = 0; i < cookiesStorage->getSize(); ++i)
     {
         const CookieData cookie = cookiesStorage->getCookie(i);
-        json[cookie.metadata] = cookie.data;
+        cookiesArray += (cookie.metadata + "=" + cookie.data).toUtf8();
+
+        if(i < cookiesStorage->getSize()-1)
+        {
+            cookiesArray += "; ";
+        }
     }
 
-    return json;
+    return cookiesArray;
 }

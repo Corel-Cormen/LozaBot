@@ -21,7 +21,6 @@ protected:
     RequestDriver driver;
 
     QNetworkRequest request{};
-    QByteArray requestData{};
 };
 
 class QNetworkReplyBridge : public QNetworkReply
@@ -80,7 +79,7 @@ TEST_F(RequestDriverTest, ConfigureRequestNoConnect)
 {
     EXPECT_CALL(mockNetworkManager, get).WillOnce(Return(nullptr));
 
-    EXPECT_EQ(RequestDriver::RequestStatus::REQUEST_STATUS_ERROR, driver.GET(request, requestData));
+    EXPECT_EQ(RequestDriver::RequestStatus::REQUEST_STATUS_ERROR, driver.GET(request));
     EXPECT_TRUE(driver.getFault().configureRequestError);
 }
 
@@ -91,7 +90,7 @@ TEST_F(RequestDriverTest, ExecuteRequestError)
     EXPECT_CALL(mockNetworkManager, get).WillOnce(Return(&reply));
     EXPECT_CALL(mockEventLoop, exec).WillOnce(Return(-1));
 
-    EXPECT_EQ(RequestDriver::RequestStatus::REQUEST_STATUS_ERROR, driver.GET(request, requestData));
+    EXPECT_EQ(RequestDriver::RequestStatus::REQUEST_STATUS_ERROR, driver.GET(request));
     EXPECT_TRUE(driver.getFault().executionRequestError);
 }
 
@@ -103,7 +102,7 @@ TEST_F(RequestDriverTest, NetworkReplyError)
     EXPECT_CALL(mockNetworkManager, get).WillOnce(Return(&reply));
     EXPECT_CALL(mockEventLoop, exec).WillOnce(Return(0));
 
-    EXPECT_EQ(RequestDriver::RequestStatus::REQUEST_STATUS_ERROR, driver.GET(request, requestData));
+    EXPECT_EQ(RequestDriver::RequestStatus::REQUEST_STATUS_ERROR, driver.GET(request));
     EXPECT_EQ(driver.getFault().networkError, static_cast<int>(QNetworkReply::TimeoutError));
 }
 
@@ -115,7 +114,7 @@ TEST_F(RequestDriverTest, GETRequestSuccessCheckFaults)
     EXPECT_CALL(mockNetworkManager, get).WillOnce(Return(&reply));
     EXPECT_CALL(mockEventLoop, exec).WillOnce(Return(0));
 
-    (void) driver.GET(request, requestData);
+    (void) driver.GET(request);
     const RequestDriverFaults drvFaults = driver.getFault();
 
     EXPECT_FALSE(drvFaults.configureRequestError);
@@ -131,7 +130,7 @@ TEST_F(RequestDriverTest, GETRequestSuccessWithEmptyResponse)
     EXPECT_CALL(mockNetworkManager, get).WillOnce(Return(&reply));
     EXPECT_CALL(mockEventLoop, exec).WillOnce(Return(0));
 
-    (void) driver.GET(request, requestData);
+    (void) driver.GET(request);
 
     const RequestDriver::MetadataList* header;
     EXPECT_EQ(Error_Code_T::ZELOLENGTH, driver.getResponseHeader(header));
@@ -148,7 +147,7 @@ TEST_F(RequestDriverTest, GETRequestSuccessWithResponse)
     EXPECT_CALL(mockNetworkManager, get).WillOnce(Return(&reply));
     EXPECT_CALL(mockEventLoop, exec).WillOnce(Return(0));
 
-    (void) driver.GET(request, requestData);
+    (void) driver.GET(request);
 
     const RequestDriver::MetadataList* header;
     EXPECT_EQ(Error_Code_T::SUCCESS, driver.getResponseHeader(header));
@@ -167,7 +166,7 @@ TEST_F(RequestDriverTest, GETRequestSuccessNoDeleteMessageTest)
     EXPECT_CALL(mockNetworkManager, get).WillOnce(Return(&reply));
     EXPECT_CALL(mockEventLoop, exec).WillOnce(Return(0));
 
-    (void) driver.GET(request, requestData);
+    (void) driver.GET(request);
 
     const RequestDriver::MetadataList* header;
     EXPECT_EQ(Error_Code_T::SUCCESS, driver.getResponseHeader(header));
@@ -193,7 +192,6 @@ protected:
     RequestDriver driver{mockEventLoop, mockNetworkManager};
 
     QNetworkRequest request{};
-    QByteArray requestData{};
 };
 
 TEST_P(RequestDriverMapingCodeTest, codeMapTest)
@@ -208,7 +206,7 @@ TEST_P(RequestDriverMapingCodeTest, codeMapTest)
     EXPECT_CALL(mockNetworkManager, get).WillOnce(Return(&reply));
     EXPECT_CALL(mockEventLoop, exec).WillOnce(Return(0));
 
-    RequestDriver::RequestStatus requestCode = driver.GET(request, requestData);
+    RequestDriver::RequestStatus requestCode = driver.GET(request);
 
     EXPECT_EQ(requestCode, expectCode);
 }

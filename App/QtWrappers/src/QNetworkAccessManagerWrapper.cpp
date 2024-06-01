@@ -1,6 +1,6 @@
 #include "QNetworkAccessManagerWrapper.hpp"
 
-QNetworkReply* QNetworkAccessManagerWrapper::get(const QNetworkRequest& request, const QByteArray& data)
+QNetworkReply* QNetworkAccessManagerWrapper::get(const QNetworkRequest& request)
 {
-    return manager.sendCustomRequest(request, "GET", data);
+    return manager.get(request);
 }

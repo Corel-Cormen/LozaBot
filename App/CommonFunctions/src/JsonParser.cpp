@@ -5,18 +5,15 @@
 
 #include "JsonParser.hpp"
 
-QByteArray JsonParser::parseJson(const QJsonObject& data)
-{
-    return QJsonDocument{data}.toJson();
-}
-
-QNetworkRequest JsonParser::parseRequest(const QString& url, const QByteArray& jsonData)
+QNetworkRequest JsonParser::parseRequest(const QString& url, const QByteArray& cookieData)
 {
     QNetworkRequest request;
 
     request.setUrl(url);
-    request.setHeader(QNetworkRequest::ContentTypeHeader, "application/json");
-    request.setHeader(QNetworkRequest::ContentLengthHeader, QByteArray::number(jsonData.size()));
+    request.setHeader(QNetworkRequest::ContentTypeHeader, "*/*");
+    request.setRawHeader("Accept-Encoding", "gzip, deflate, br, zstd");
+    request.setRawHeader("Cookie", cookieData);
+    request.setHeader(QNetworkRequest::UserAgentHeader, "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.0.0 Safari/537.36");
 
     return request;
 }

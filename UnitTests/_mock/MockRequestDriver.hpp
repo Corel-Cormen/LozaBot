@@ -7,6 +7,6 @@
 class MockRequestDriver : public RequestDriverInterface
 {
 public:
-    MOCK_METHOD(RequestStatus, GET, (const QNetworkRequest& request, const QByteArray& data), (override));
+    MOCK_METHOD(RequestStatus, GET, (const QNetworkRequest& request), (override));
     MOCK_METHOD(Error_Code_T, getResponseHeader, (const MetadataList*& header), (override));
 };

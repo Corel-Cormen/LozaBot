@@ -9,7 +9,7 @@ public:
 
     ~QNetworkAccessManagerWrapper() = default;
 
-    virtual QNetworkReply* get(const QNetworkRequest& request, const QByteArray& data);
+    virtual QNetworkReply* get(const QNetworkRequest& request);
 
 private:
     QNetworkAccessManager manager;

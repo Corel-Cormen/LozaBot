@@ -9,21 +9,28 @@ protected:
     RequestDataCache dataCache;
 };
 
-TEST_F(RequestDataCacheTest, getEmptyJsonTest)
+TEST_F(RequestDataCacheTest, getEmptyCookiesTest)
 {
-    QJsonObject jsonCookie = dataCache.getCookies();
+    QByteArray jsonCookie = dataCache.getRawCookies();
     EXPECT_TRUE(jsonCookie.isEmpty());
 }
 
-TEST_F(RequestDataCacheTest, getJsonTest)
+TEST_F(RequestDataCacheTest, getOnePartCookiesTest)
 {
     CookieData cookie{ .metadata = "metadata", .data = "data"};
+    QByteArray expectCookie{"metadata=data"};
     dataCache.updateCookies(JsonUtils::createCookieRawData(cookie, false));
 
-    QJsonObject jsonCookie = dataCache.getCookies();
-    ASSERT_EQ(jsonCookie.size(), 1);
+    QByteArray cookieArray = dataCache.getRawCookies();
+    EXPECT_STREQ(cookieArray, expectCookie);
+}
 
-    QVariantMap jsonMap = jsonCookie.toVariantMap();
-    EXPECT_TRUE(jsonMap.contains(cookie.metadata));
-    EXPECT_STREQ(jsonMap[cookie.metadata].toString().toStdString().c_str(), cookie.data.toStdString().c_str());
+TEST_F(RequestDataCacheTest, getMultiplePartCookiesTest)
+{
+    dataCache.updateCookies(JsonUtils::createCookieRawData({ .metadata = "metadata1", .data = "data1"}, false));
+    dataCache.updateCookies(JsonUtils::createCookieRawData({ .metadata = "metadata2", .data = "data2"}, false));
+    QByteArray expectCookie{"metadata1=data1; metadata2=data2"};
+
+    QByteArray cookieArray = dataCache.getRawCookies();
+    EXPECT_STREQ(cookieArray, expectCookie);
 }

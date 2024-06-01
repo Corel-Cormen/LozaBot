@@ -14,7 +14,7 @@ public:
 
     void updateCookies(const QByteArray& cookiesData);
 
-    QJsonObject getCookies() const;
+    QByteArray getRawCookies() const;
 
 private:
     CookieStorage* cookiesStorage;

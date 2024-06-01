@@ -13,10 +13,9 @@ RequestController::RequestController(RequestDriverInterface& _requestDrv) :
 Error_Code_T RequestController::enterWebsite(const QString& url)
 {
     Error_Code_T reqStatus = Error_Code_T::ERROR;
-    QByteArray jsonData = JsonParser::parseJson(cookieCache.getCookies());
-    QNetworkRequest request = JsonParser::parseRequest(url, jsonData);
+    QNetworkRequest request = JsonParser::parseRequest(url, cookieCache.getRawCookies());
 
-    RequestDriverInterface::RequestStatus reqCode = requestDrv.GET(request, jsonData);
+    RequestDriverInterface::RequestStatus reqCode = requestDrv.GET(request);
 
     if(reqCode == RequestDriverInterface::RequestStatus::OK)
     {
