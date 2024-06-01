@@ -1,13 +1,10 @@
-project(RequestDataCacheTest)
+project(CommonFunctionsTest)
 
-get_source_properties(RequestDataCache)
+get_source_properties(CommonFunctions)
 
 add_executable(${PROJECT_NAME}
     ${LIB_SOURCE}
-    JsonUtils.hpp
-    RequestDataCacheTest.cpp
-    CookieFactoryTest.cpp
-    CookieStorageTest.cpp
+    JsonParserTest.cpp
 )
 
 target_link_libraries(${PROJECT_NAME}

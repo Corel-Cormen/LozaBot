@@ -25,6 +25,7 @@ set(GTEST_LIBS
     gmock_main
 )
 
+add_subdirectory(CommonFunctionsTest)
 add_subdirectory(RequestDriverTest)
 add_subdirectory(RequestControllerTest)
 add_subdirectory(RequestDataCacheTest)
